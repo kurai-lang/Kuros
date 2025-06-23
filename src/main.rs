@@ -39,7 +39,7 @@ fn main() {
             let status = Command::new(kuraic_path)
                 .arg("./src/main.kurai")
                 .arg("-o")
-                .arg(&project_name)
+                .arg(format!("./target/{}",project_name))
                 .status()
                 .unwrap();
 
