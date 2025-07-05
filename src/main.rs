@@ -1,4 +1,4 @@
-use std::{env, io, process::Command};
+use std::{env, path::PathBuf, process::Command};
 use clap::{Parser, Subcommand};
 
 use colored::Colorize;
@@ -17,7 +17,10 @@ enum Commands {
     },
     Run {
         #[arg()]
-        args: Vec<String>
+        args: Vec<String>,
+
+        #[arg(long, action)]
+        show_output_files: bool,
     }
 }
 
@@ -27,19 +30,29 @@ fn main() {
     let binding_file = binding.file_name().unwrap();
     let project_name = binding_file.to_str().unwrap();
 
-    let mut kuraic_path = dirs::home_dir().expect("No home directory found");
-    kuraic_path.push(".local/bin/kuraic");
+    let home = dirs::home_dir().expect("No home directory found");
+    let kuraic_path: PathBuf = home.join(".local/bin/kuraic");
+
+    let output_path = format!("./target/{}", project_name);
+    // let kuraic_path_str = kuraic_path.to_str().unwrap();
 
     match &cli.command {
         Commands::New { name } => {
             println!("Creating a new project");
             init(&name.clone()).unwrap();
         }
-        Commands::Run { args } => {
-            let status = Command::new(kuraic_path)
+        Commands::Run { show_output_files, ..} => {
+            let mut command = Command::new(&kuraic_path);
+            command
                 .arg("./src/main.kurai")
                 .arg("-o")
-                .arg(format!("./target/{}",project_name))
+                .arg(&output_path);
+
+            if *show_output_files {
+                command.arg("--show-output-files");
+            }
+
+            let status = command
                 .status()
                 .unwrap();
 
@@ -47,6 +60,6 @@ fn main() {
                 eprintln!("{}: Dawg it failed", "error".red().bold());
             }
         }
-        _ => println!("You entered nothing relevant..?\nTry `kuros new project_name`"),
+        _ => eprintln!("You entered nothing relevant..?\nTry `kuros new project_name`"),
     }
 }

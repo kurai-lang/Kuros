@@ -23,14 +23,11 @@ pub fn init(name: &String) -> io::Result<()> {
     )?;
 
     let mut file2 = File::create(&config_file)?;
+
+    // For the kuros.toml file
     writeln!(file2, "[package]")?;
     writeln!(file2, "name = \"{}\"", root.to_str().unwrap())?;
     writeln!(file2, "version = \"0.1.0\"")?;
-
-    writeln!(file2, "[language]")?;
-    writeln!(file2, "for_style = \"range\" # range, classic, or both")?;
-    writeln!(file2, "bm_mode = true")?;
-    writeln!(file2, "experimental_features = [] # we can just omit this fr")?;
 
     println!("Project '{}' initialized successfully!", name);
     Ok(())
