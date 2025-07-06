@@ -2,7 +2,7 @@ use std::{env, path::PathBuf, process::Command};
 use clap::{Parser, Subcommand};
 
 use colored::Colorize;
-use kuros::start::init;
+use kuros::{manage_toml::manage_toml, start::init};
 
 #[derive(Parser)]
 struct Cli {
@@ -21,6 +21,12 @@ enum Commands {
 
         #[arg(long, action)]
         show_output_files: bool,
+
+        // #[arg(short = 'L', long = "lib-dir", num_args = 1.., value_name = "DIR")]
+        // lib_dirs: Vec<String>,
+        //
+        // #[arg(short = 'l', long = "link-lib", num_args = 1.., value_name = "LIB")]
+        // link_libs: Vec<String>,
     }
 }
 
@@ -41,12 +47,14 @@ fn main() {
             println!("Creating a new project");
             init(&name.clone()).unwrap();
         }
-        Commands::Run { show_output_files, ..} => {
+        Commands::Run { show_output_files, .. } => {
             let mut command = Command::new(&kuraic_path);
             command
                 .arg("./src/main.kurai")
                 .arg("-o")
                 .arg(&output_path);
+
+            manage_toml(&mut command).unwrap();
 
             if *show_output_files {
                 command.arg("--show-output-files");

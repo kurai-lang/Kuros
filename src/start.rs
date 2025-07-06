@@ -25,9 +25,20 @@ pub fn init(name: &String) -> io::Result<()> {
     let mut file2 = File::create(&config_file)?;
 
     // For the kuros.toml file
+    let newline = |f: &mut File| writeln!(f, "\n").unwrap();
     writeln!(file2, "[package]")?;
     writeln!(file2, "name = \"{}\"", root.to_str().unwrap())?;
     writeln!(file2, "version = \"0.1.0\"")?;
+    newline(&mut file2);
+
+    writeln!(file2, "[profile]")?;
+    writeln!(file2, "opt-level = 3")?;
+    newline(&mut file2);
+
+    writeln!(file2, "[build]")?;
+    writeln!(file2, "external_libs = []")?;
+    writeln!(file2, "external_libs_paths = []")?;
+    newline(&mut file2);
 
     println!("Project '{}' initialized successfully!", name);
     Ok(())
