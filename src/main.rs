@@ -36,8 +36,7 @@ fn main() {
     let binding_file = binding.file_name().unwrap();
     let project_name = binding_file.to_str().unwrap();
 
-    let home = dirs::home_dir().expect("No home directory found");
-    let kuraic_path: PathBuf = home.join(".local/bin/kuraic");
+    let kuraic_path: PathBuf = PathBuf::from("/usr/local/bin/vync");
 
     let output_path = format!("./target/{}", project_name);
     // let kuraic_path_str = kuraic_path.to_str().unwrap();
@@ -54,15 +53,18 @@ fn main() {
                 .arg("-o")
                 .arg(&output_path);
 
-            manage_toml(&mut command).unwrap();
+            manage_toml(&mut command).unwrap_or_else(|e| {
+                panic!("manage_toml failed: {e}");
+            });
 
             if *show_output_files {
                 command.arg("--show-output-files");
             }
 
+            println!("Running command: {:?}", command);
             let status = command
                 .status()
-                .unwrap();
+                .unwrap_or_else(|e| panic!("{}", e));
 
             if !status.success() {
                 eprintln!("{}: Dawg it failed", "error".red().bold());
