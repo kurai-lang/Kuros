@@ -61,7 +61,9 @@ fn main() {
                 command.arg("--show-output-files");
             }
 
+            #[cfg(debug_assertions)]
             println!("Running command: {:?}", command);
+
             let status = command
                 .status()
                 .unwrap_or_else(|e| panic!("{}", e));
